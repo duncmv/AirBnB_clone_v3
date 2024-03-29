@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""starts a route"""
+"""starts a status route"""
 from api.v1.views import app_views
 from flask import jsonify
 
