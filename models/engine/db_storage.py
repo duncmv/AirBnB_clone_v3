@@ -81,6 +81,7 @@ class DBStorage:
         for key in objs.keys():
             if id in key:
                 return objs[key]
+        return None
 
     def count(self, cls=None):
         """counts number of objects"""
