@@ -31,6 +31,8 @@ def place_by_city(city_id):
         user = storage.get(User, params['user_id'])
         if user is None:
             abort(404)
+        if 'name' not in params:
+            return make_response("Missing name\n", 400)
         params['city_id'] = city_id
         new = Place(**params)
         new.save()
