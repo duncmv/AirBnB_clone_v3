@@ -20,13 +20,14 @@ def city_by_state(state_id):
 
     if request.method == 'POST':
         params = request.get_json(silent=True)
-        state = storage.get(State, params['state_id'])
+        state = storage.get(State, state_id)
         if state is None:
             abort(404)
         if not params:
             return make_response("Not a JSON\n", 400)
         if 'name' not in params:
             return make_response("Missing name\n", 400)
+        params['state_id'] = state_id
         new = City(**params)
         new.save()
         return jsonify(new.to_dict()), 201
