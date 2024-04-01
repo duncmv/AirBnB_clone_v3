@@ -44,13 +44,13 @@ def places(place_id):
         if place_id is None:
             abort(404)
         else:
-            place = storage.get(place, place_id)
+            place = storage.get(Place, place_id)
             if place is None:
                 abort(404)
             return jsonify(place.to_dict())
 
     if request.method == 'DELETE':
-        place = storage.get(place, place_id)
+        place = storage.get(Place, place_id)
         if place is not None:
             storage.delete(place)
             storage.save()
@@ -58,7 +58,7 @@ def places(place_id):
         abort(404)
 
     if request.method == 'PUT':
-        place = storage.get(place, place_id)
+        place = storage.get(Place, place_id)
         if place is None:
             abort(404)
         params = request.get_json(silent=True)
