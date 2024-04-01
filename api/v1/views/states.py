@@ -5,7 +5,8 @@ from flask import jsonify, request, make_response, abort
 from models import storage
 from models.state import State
 
-@app_views.route("/states", strict_slashes= False,
+
+@app_views.route("/states", strict_slashes=False,
                  methods=['GET', 'POST'])
 @app_views.route('/states/<state_id>', strict_slashes=False,
                  methods=['GET', 'DELETE', 'PUT'])
