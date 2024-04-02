@@ -2,7 +2,7 @@
 """starts a places route"""
 from api.v1.views import app_views
 from flask import jsonify, request, make_response, abort
-from models import storage
+from models import storage, storage_t
 from models.place import Place
 from models.city import City
 from models.user import User
@@ -72,3 +72,50 @@ def places(place_id):
             setattr(place, k, v)
         place.save()
         return jsonify(place.to_dict())
+
+@app_views.route("/places_search", strict_slashes=False,
+                 methods=['POST'])
+def place_search():
+    """returns places based on json criteria"""
+    params = request.get_json(silent=True)
+    if not params:
+        return make_response("Not a JSON\n", 400)
+    state_ids = params.get("states", [])
+    city_ids = params.get("cities", [])
+    amenity_ids = params.get("amenities", [])
+
+    length_ids = len(state_ids) + len (city_ids) + len(amenity_ids)
+    all_places = list(storage.all(Place).values())
+    if len(params) == 0 or length_ids == 0:
+        return jsonify([p.to_dict() for p in all_places])
+
+    placeList = []
+    state_cities = []
+
+    if len(state_ids) != 0:
+        for state_id in state_ids:
+            state = storage.get("State", state_id)
+            s_cities = state.cities
+            state_cities.extend(list(s_cities))
+        for city in state_cities:
+            list_1 = [p for p in all_places if p.city_id == city.id]
+            placeList.extend(list_1)
+
+    if len(city_ids) != 0:
+        for city_id in city_ids:
+            city = storage.get("City", city_id)
+            if city not in state_cities:
+                list_2 = [p for p in all_places if p.city_id == city_id]
+                placeList.extend(list_2)
+
+    if len(amenity_ids) != 0:
+        if len(placeList) == 0:
+            placeList.extend(all_places)
+        for amenity_id in amenity_ids:
+            amenity = storage.get("Amenity", amenity_id)
+            if storage_t == 'db':
+                placeList = [p for p in placeList if amenity in p.amenities]
+            else:
+                placeList = [p for p in placeList if amenity_id in p.amenity_ids]
+    
+    return jsonify([p.to_dict for p in placeList])
