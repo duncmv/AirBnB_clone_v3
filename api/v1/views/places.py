@@ -119,4 +119,4 @@ def place_search():
             else:
                 pList = [p for p in pList if amenity_id in p.amenity_ids]
 
-    return jsonify([p.to_dict for p in pList])
+    return jsonify([p.to_dict() for p in pList])
