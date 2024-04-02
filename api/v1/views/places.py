@@ -73,6 +73,7 @@ def places(place_id):
         place.save()
         return jsonify(place.to_dict())
 
+
 @app_views.route("/places_search", strict_slashes=False,
                  methods=['POST'])
 def place_search():
@@ -84,12 +85,12 @@ def place_search():
     city_ids = params.get("cities", [])
     amenity_ids = params.get("amenities", [])
 
-    length_ids = len(state_ids) + len (city_ids) + len(amenity_ids)
+    length_ids = len(state_ids) + len(city_ids) + len(amenity_ids)
     all_places = list(storage.all(Place).values())
     if len(params) == 0 or length_ids == 0:
         return jsonify([p.to_dict() for p in all_places])
 
-    placeList = []
+    pList = []
     state_cities = []
 
     if len(state_ids) != 0:
@@ -99,23 +100,23 @@ def place_search():
             state_cities.extend(list(s_cities))
         for city in state_cities:
             list_1 = [p for p in all_places if p.city_id == city.id]
-            placeList.extend(list_1)
+            pList.extend(list_1)
 
     if len(city_ids) != 0:
         for city_id in city_ids:
             city = storage.get("City", city_id)
             if city not in state_cities:
                 list_2 = [p for p in all_places if p.city_id == city_id]
-                placeList.extend(list_2)
+                pList.extend(list_2)
 
     if len(amenity_ids) != 0:
-        if len(placeList) == 0:
-            placeList.extend(all_places)
+        if len(state_ids) == 0 and len(city_ids) == 0:
+            pList.extend(all_places)
         for amenity_id in amenity_ids:
             amenity = storage.get("Amenity", amenity_id)
             if storage_t == 'db':
-                placeList = [p for p in placeList if amenity in p.amenities]
+                pList = [p for p in pList if amenity in p.amenities]
             else:
-                placeList = [p for p in placeList if amenity_id in p.amenity_ids]
-    
-    return jsonify([p.to_dict for p in placeList])
+                pList = [p for p in pList if amenity_id in p.amenity_ids]
+
+    return jsonify([p.to_dict for p in pList])
