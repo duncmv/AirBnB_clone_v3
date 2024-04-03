@@ -79,7 +79,7 @@ def places(place_id):
 def place_search():
     """returns places based on json criteria"""
     params = request.get_json(silent=True)
-    if not params:
+    if params is None:
         return make_response("Not a JSON\n", 400)
     state_ids = params.get("states", [])
     city_ids = params.get("cities", [])
@@ -87,7 +87,7 @@ def place_search():
 
     length_ids = len(state_ids) + len(city_ids) + len(amenity_ids)
     all_places = list(storage.all(Place).values())
-    if len(params) == 0 or length_ids == 0:
+    if length_ids == 0:
         return jsonify([p.to_dict() for p in all_places])
 
     pList = []
